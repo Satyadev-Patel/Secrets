@@ -29,7 +29,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-mongoose.connect("mongodb+srv://satyadev:guru3003@cluster0.t7ikj.mongodb.net/test", { useNewUrlParser: true });
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true });
 mongoose.set("useCreateIndex", true);
 
 const userSchema = new mongoose.Schema({
