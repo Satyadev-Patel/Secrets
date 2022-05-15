@@ -12,7 +12,7 @@ const passportLocalMongoose = require("passport-local-mongoose");
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const findOrCreate = require('mongoose-findorcreate');
 const RSA = require('./rsa');
-const AES = require('./aes');
+// const AES = require('./aes');
 const { response } = require('express');
 const keys = RSA.generate(250);
 
