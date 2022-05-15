@@ -1,6 +1,8 @@
 //jshint esversion:6
 require('dotenv').config();
+const axios = require("axios");
 const express = require("express");
+const fetch = require("fetch");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
@@ -10,6 +12,8 @@ const passportLocalMongoose = require("passport-local-mongoose");
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const findOrCreate = require('mongoose-findorcreate');
 const RSA = require('./rsa');
+const AES = require('./aes');
+const { response } = require('express');
 const keys = RSA.generate(250);
 
 const app = express();
@@ -37,6 +41,9 @@ const userSchema = new mongoose.Schema({
   password: String,
   googleId: String,
   secret: String,
+  algo: String,
+  encrypt: String,
+  decrypt: String,
 });
 
 userSchema.plugin(passportLocalMongoose);
@@ -104,7 +111,9 @@ app.get("/secrets", function (req, res) {
           let temp_msg = foundUsers[i].secret;
           const decrypted_message = RSA.decrypt(temp_msg, process.env.KEY_D, process.env.KEY_N);
           const decoded_message = RSA.decode(decrypted_message);
+          foundUsers[i].encrypt = temp_msg;
           foundUsers[i].secret = decoded_message;
+
         }
         res.render("secrets", { usersWithSecrets: foundUsers });
       }
@@ -133,16 +142,14 @@ app.post("/submit", function (req, res) {
       if (foundUser) {
 
         // Generate RSA keys
+        console.log(req.body);
 
-
-        console.log('Keys');
-        console.log('n:', process.env.KEY_N.toString());
-        console.log('d:', process.env.KEY_D.toString());
-        console.log('e:', process.env.KEY_E.toString());
 
         const encoded_message = RSA.encode(submittedSecret);
         const encrypted_message = RSA.encrypt(encoded_message, process.env.KEY_N, process.env.KEY_E)
         foundUser.secret = encrypted_message;
+        foundUser.algo = 'RSA';
+
         foundUser.save(function () {
           res.redirect("/secrets");
         });
