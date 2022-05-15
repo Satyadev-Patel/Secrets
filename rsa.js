@@ -1,7 +1,7 @@
 const bigInt = require('big-integer');
 
 class RSA {
-  static randomPrime(bits) {
+  static prime_generator(bits) {
     const min = bigInt.one.shiftLeft(bits - 1);
     const max = bigInt.one.shiftLeft(bits).prev();
     
@@ -20,8 +20,8 @@ class RSA {
     let totient;
   
     do {
-      p = this.randomPrime(keysize / 2);
-      q = this.randomPrime(keysize / 2);
+      p = this.prime_generator(keysize / 2);
+      q = this.prime_generator(keysize / 2);
       totient = bigInt.lcm(
         p.prev(),
         q.prev()
